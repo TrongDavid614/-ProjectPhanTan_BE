@@ -2,6 +2,7 @@ package com.eightthreads.backend.controller;
 
 import com.eightthreads.backend.dto.request.OrderCreateRequest;
 import com.eightthreads.backend.dto.response.OrderCreateResponse;
+import com.eightthreads.backend.dto.response.OrderHistoryResponse;
 import com.eightthreads.backend.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -25,5 +27,10 @@ public class OrderController {
 
         OrderCreateResponse response = orderService.createOrderAndGetPaymentUrl(request, httpRequest);
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<OrderHistoryResponse>> getOrderHistory(@PathVariable("userId") String userId) {
+        List<OrderHistoryResponse> history = orderService.getUserOrderHistory(userId);
+        return ResponseEntity.ok(history);
     }
 }

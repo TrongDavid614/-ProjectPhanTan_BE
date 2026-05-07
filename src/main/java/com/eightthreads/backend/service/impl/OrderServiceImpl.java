@@ -3,6 +3,7 @@ package com.eightthreads.backend.service.impl;
 import com.eightthreads.backend.dto.request.OrderCreateRequest;
 import com.eightthreads.backend.dto.request.OrderItemRequest;
 import com.eightthreads.backend.dto.response.OrderCreateResponse;
+import com.eightthreads.backend.dto.response.OrderHistoryResponse;
 import com.eightthreads.backend.entity.*;
 import com.eightthreads.backend.repository.*;
 import com.eightthreads.backend.service.OrderService;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,11 +106,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void processSuccessfulPayment(String orderId, String vnpayTransactionNo) {
-        // 1. Lấy đơn hàng PENDING ra
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng: " + orderId));
 
-        // Kiểm tra chống xử lý đúp (Idempotency)
         if (paymentRepository.existsByOrder_OrderId(orderId) || "paid".equals(order.getStatus())) {
             return;
         }
@@ -117,12 +117,9 @@ public class OrderServiceImpl implements OrderService {
             return;
         }
 
-        // 2. Cập nhật trạng thái
         order.setStatus("paid");
 
-        // 3. Tạo lịch sử giao dịch (Payment)
         Payment payment = Payment.builder()
-                // Dùng UUID 8 ký tự để đảm bảo không bao giờ trùng lặp ID
                 .paymentId("PAY_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .order(order)
                 .method("VNPAY")
@@ -134,26 +131,22 @@ public class OrderServiceImpl implements OrderService {
         paymentRepository.save(payment);
         order.setPayment(payment);
 
-        // 4. Cập nhật sold_quantity và Sinh mã vé (Gộp chung 1 vòng lặp để tối ưu hiệu năng)
         List<Ticket> generatedTickets = new ArrayList<>();
 
         for (OrderItem item : order.getOrderItems()) {
 
-            // --- Xử lý Ticket Type (Cộng số lượng) ---
             TicketType ticketType = item.getTicketType();
             int currentSold = ticketType.getSoldQuantity() == null ? 0 : ticketType.getSoldQuantity();
             ticketType.setSoldQuantity(currentSold + item.getQuantity());
-            // (Nhờ @Transactional, JPA sẽ tự động update xuống DB, nhưng gọi save() vẫn an toàn)
             ticketTypeRepository.save(ticketType);
 
-            // --- Xử lý Sinh Vé tương ứng với số lượng ---
             for (int i = 0; i < item.getQuantity(); i++) {
                 String uniqueCode = "TKT-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
 
                 Ticket ticket = Ticket.builder()
                         .ticketId(UUID.randomUUID().toString())
                         .event(order.getEvent())
-                        .ticketType(ticketType) // Dùng luôn biến ticketType ở trên
+                        .ticketType(ticketType)
                         .order(order)
                         .owner(order.getUser())
                         .qrCode(uniqueCode)
@@ -163,13 +156,29 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        // 5. Lưu toàn bộ vé vào DB trong 1 lần (Batch Insert)
         ticketRepository.saveAll(generatedTickets);
 
-        // Lưu Order để chốt trạng thái
         orderRepository.save(order);
 
         // 6. Gửi Email thông báo chứa mã vé cho khách hàng (Nếu có)
         // emailService.sendTicketEmail(order.getUser(), generatedTickets);
+    }
+    @Override
+    public List<OrderHistoryResponse> getUserOrderHistory(String userId) {
+        List<Order> orders = orderRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
+
+        return orders.stream().map(order -> {
+            String payMethod = (order.getPayment() != null) ? order.getPayment().getMethod() : "Chưa thanh toán";
+
+            return OrderHistoryResponse.builder()
+                    .orderId(order.getOrderId())
+                    .totalAmount(order.getTotalAmount())
+                    .status(order.getStatus())
+                    .createdAt(order.getCreatedAt())
+                    .eventName(order.getEvent().getName())
+                    .eventImg(order.getEvent().getImg())
+                    .paymentMethod(payMethod)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
