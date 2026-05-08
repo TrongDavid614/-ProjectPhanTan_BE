@@ -4,16 +4,19 @@ import com.eightthreads.backend.dto.request.UserRegisterRequest;
 import com.eightthreads.backend.entity.User;
 import com.eightthreads.backend.repository.UserRepository;
 import com.eightthreads.backend.service.AuthService;
+import com.eightthreads.backend.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -34,7 +37,48 @@ public class AuthServiceImpl implements AuthService {
                 .authProvider("local")
                 .build();
 
-        // 3. Lưu vào DB
         userRepository.save(newUser);
+    }
+    public void processForgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản với email này!"));
+
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:3000/reset-password?token=" + token;
+
+        emailService.sendPasswordResetEmail(email, resetLink);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new RuntimeException("Mã khôi phục không hợp lệ hoặc đã hết hạn!"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Map<String,Object> login(String account, String password) {
+        User user = userRepository.findByEmail(account)
+                .orElseThrow(() -> new RuntimeException("Sai tài khoản hoặc mật khẩu"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Sai tài khoản hoặc mật khẩu");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        Map<String,Object> userInfo = Map.of(
+                "id", user.getUserId(),
+                "email", user.getEmail(),
+                "firstName", user.getFirstName(),
+                "lastName", user.getLastName()
+        );
+
+        return Map.of("token", token, "user", userInfo);
     }
 }

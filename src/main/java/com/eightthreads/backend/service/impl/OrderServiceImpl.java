@@ -155,13 +155,8 @@ public class OrderServiceImpl implements OrderService {
                 generatedTickets.add(ticket);
             }
         }
-
         ticketRepository.saveAll(generatedTickets);
-
         orderRepository.save(order);
-
-        // 6. Gửi Email thông báo chứa mã vé cho khách hàng (Nếu có)
-        // emailService.sendTicketEmail(order.getUser(), generatedTickets);
     }
     @Override
     public List<OrderHistoryResponse> getUserOrderHistory(String userId) {

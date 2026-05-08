@@ -22,6 +22,9 @@ public class User {
     @Column(name = "user_id", length = 50)
     private String userId;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
     @Column(name = "first_name", length = 100)
     private String firstName;
 
