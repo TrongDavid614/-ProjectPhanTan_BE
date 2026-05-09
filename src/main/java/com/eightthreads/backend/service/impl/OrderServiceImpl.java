@@ -34,8 +34,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     public OrderCreateResponse createOrderAndGetPaymentUrl(OrderCreateRequest request, HttpServletRequest httpRequest) throws UnsupportedEncodingException {
-        User user = userRepository.findById(request.getUserId())
+        // Try to find user by primary id first; if not found, fall back to email lookup.
+        User user = userRepository.findById(request.getUserId()).orElse(null);
+        if (user == null) {
+            user = userRepository.findByEmail(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("Khong tim thay nguoi dung: " + request.getUserId()));
+        }
         Event event = eventRepository.findById(request.getEventId())
                 .orElseThrow(() -> new RuntimeException("Khong tim thay su kien: " + request.getEventId()));
 

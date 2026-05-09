@@ -26,12 +26,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Không lưu session (Chuẩn JWT sau này)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/ai/**").permitAll()
                         .requestMatchers("/api/v1/tickets/**").permitAll()
                         .requestMatchers("/api/v1/payment/**").permitAll()
                         .requestMatchers("/api/v1/events/**").permitAll()
                         .requestMatchers("/api/v1/orders/**").permitAll()
                         .requestMatchers("/api/v1/vouchers/**").permitAll()
-
                         .anyRequest().authenticated()
                 );
 

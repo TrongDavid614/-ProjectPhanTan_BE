@@ -30,7 +30,6 @@ public class VNPAYConfig {
                 sb.append(fieldName);
                 sb.append("=");
                 try {
-                    // SỬA Ở ĐÂY: Encode chuẩn theo UTF-8
                     sb.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
                 } catch (UnsupportedEncodingException e) {
                     sb.append(fieldValue);
@@ -47,7 +46,6 @@ public class VNPAYConfig {
         try {
             if (key == null || data == null) throw new NullPointerException();
             final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            // SỬA Ở ĐÂY: Chắc chắn lấy bytes theo UTF-8
             byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
             final SecretKeySpec secretKeySpec = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
             hmac512.init(secretKeySpec);

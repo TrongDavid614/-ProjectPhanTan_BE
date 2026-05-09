@@ -44,7 +44,6 @@ public class PaymentController {
         fields.remove("vnp_SecureHashType");
         fields.remove("vnp_SecureHash");
 
-        // Kiểm tra chữ ký bảo mật
         String signValue = VNPAYConfig.hashAllFields(fields, vnpayConfig.getSecretKey());
 
         System.out.println("Mã Hash VNPAY gửi lên: " + vnp_SecureHash);

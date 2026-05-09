@@ -1,11 +1,11 @@
 package com.eightthreads.backend.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 @Entity
 @Table(name = "Ticket_Types")
 @Getter
@@ -15,11 +15,12 @@ import java.util.List;
 @Builder
 public class TicketType {
     @Id
-    @Column(name = "ticket_type_id", length = 50)
-    private String ticketTypeId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ticketTypeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @JsonIgnore
     private Event event;
 
     @Column(nullable = false, length = 100)
