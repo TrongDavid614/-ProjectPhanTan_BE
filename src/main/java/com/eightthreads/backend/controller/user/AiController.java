@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/ai")
+@RequestMapping("/api/user/ai")
 @CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AiController {

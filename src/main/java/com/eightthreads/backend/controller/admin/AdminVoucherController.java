@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/admin/vouchers")
+@RequestMapping("/api/admin/vouchers")
 @RequiredArgsConstructor
 public class AdminVoucherController {
 

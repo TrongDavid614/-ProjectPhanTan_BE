@@ -6,20 +6,38 @@ import com.eightthreads.backend.dto.request.admin.AdminEventUpdateRequest;
 import com.eightthreads.backend.dto.response.ApiResponse;
 import com.eightthreads.backend.dto.response.admin.AdminEventResponse;
 import com.eightthreads.backend.service.admin.AdminEventService;
+import com.eightthreads.backend.service.user.CloudinaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/admin/events")
+@RequestMapping("/api/admin/events")
 @RequiredArgsConstructor
 public class AdminEventController {
 
     private final AdminEventService adminEventService;
+    private final CloudinaryService cloudinaryService;
+
+    @PostMapping("/upload")
+    public ResponseEntity<ApiResponse<Map<String, String>>> uploadEventImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String imageUrl = cloudinaryService.uploadImage(file);
+            Map<String, String> result = new HashMap<>();
+            result.put("url", imageUrl);
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.OK.value(), "Upload ảnh thành công", result), HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Upload ảnh thất bại: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<AdminEventResponse>> createEvent(@Valid @RequestBody AdminEventCreateRequest request) {

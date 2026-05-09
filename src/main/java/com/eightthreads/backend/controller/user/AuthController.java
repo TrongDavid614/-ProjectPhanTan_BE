@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AuthController {
@@ -46,11 +46,15 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String,String> body) {
+    public ResponseEntity<?> login(@RequestBody Map<String, Object> body) {
         try {
-            String account = body.get("account");
-            String password = body.get("password");
-            Map<String,Object> resp = authService.login(account, password);
+            String account = body.get("account") == null ? null : body.get("account").toString();
+            String password = body.get("password") == null ? null : body.get("password").toString();
+            Object adminFlag = body.get("isAdmin");
+            boolean isAdminLogin = adminFlag instanceof Boolean
+                    ? (Boolean) adminFlag
+                    : Boolean.parseBoolean(adminFlag == null ? "false" : adminFlag.toString());
+            Map<String, Object> resp = authService.login(account, password, isAdminLogin);
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));

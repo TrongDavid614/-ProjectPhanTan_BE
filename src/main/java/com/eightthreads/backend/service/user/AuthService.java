@@ -9,4 +9,5 @@ public interface AuthService {
     void processForgotPassword(String email);
     void resetPassword(String token, String newPassword);
     Map<String, Object> login(String account, String password);
+    Map<String, Object> login(String account, String password, boolean isAdminLogin);
 }

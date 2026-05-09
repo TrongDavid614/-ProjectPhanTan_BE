@@ -18,7 +18,7 @@ import java.util.Map;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/v1/payment")
+@RequestMapping("/api/user/payment")
 @RequiredArgsConstructor
 public class PaymentController {
 
