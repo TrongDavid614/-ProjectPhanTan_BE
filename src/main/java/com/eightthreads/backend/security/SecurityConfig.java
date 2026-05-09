@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/events/**").permitAll()
                         .requestMatchers("/api/v1/orders/**").permitAll()
                         .requestMatchers("/api/v1/vouchers/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 

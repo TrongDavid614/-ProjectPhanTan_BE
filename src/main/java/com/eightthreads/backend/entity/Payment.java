@@ -1,4 +1,6 @@
 package com.eightthreads.backend.entity;
+
+import com.eightthreads.backend.common.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +32,7 @@ public class Payment {
     private String currency = "VND";
 
     @Column(length = 20)
-    private String status = "pending";
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name = "txn_ref", length = 100)
     private String txnRef;

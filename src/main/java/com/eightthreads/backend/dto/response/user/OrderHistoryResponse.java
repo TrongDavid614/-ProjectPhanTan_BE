@@ -1,4 +1,4 @@
-package com.eightthreads.backend.dto.response;
+package com.eightthreads.backend.dto.response.user;
 
 import com.eightthreads.backend.common.enums.OrderStatus;
 import lombok.Builder;

@@ -1,4 +1,6 @@
 package com.eightthreads.backend.entity;
+
+import com.eightthreads.backend.common.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,7 +32,7 @@ public class Order {
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Column(length = 20)
-    private String status = "pending";
+    private OrderStatus status = OrderStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

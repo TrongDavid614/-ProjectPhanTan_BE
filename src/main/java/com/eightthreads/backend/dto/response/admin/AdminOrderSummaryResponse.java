@@ -1,4 +1,4 @@
-package com.eightthreads.backend.dto.response;
+package com.eightthreads.backend.dto.response.admin;
 
 import com.eightthreads.backend.common.enums.OrderStatus;
 import lombok.Builder;
@@ -9,14 +9,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class OrderHistoryResponse {
+public class AdminOrderSummaryResponse {
     private String orderId;
+    private String eventId;
+    private String eventName;
+    private String userId;
     private BigDecimal totalAmount;
     private OrderStatus status;
     private LocalDateTime createdAt;
-
-    private String eventName;
-    private String eventImg;
-
-    private String paymentMethod;
 }
+

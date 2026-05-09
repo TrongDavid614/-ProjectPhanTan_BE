@@ -1,5 +1,6 @@
 package com.eightthreads.backend.entity;
 
+import com.eightthreads.backend.common.enums.EventStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,7 +54,7 @@ public class Event {
     private String country;
 
     @Column(length = 20)
-    private String status = "active";
+    private EventStatus status = EventStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")

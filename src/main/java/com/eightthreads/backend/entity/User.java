@@ -1,5 +1,6 @@
 package com.eightthreads.backend.entity;
 
+import com.eightthreads.backend.common.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -35,7 +36,7 @@ public class User {
     private String email;
 
     @Column(length = 20)
-    private String role = "customer";
+    private Role role;
 
     @Column(length = 20)
     private String status = "active";
