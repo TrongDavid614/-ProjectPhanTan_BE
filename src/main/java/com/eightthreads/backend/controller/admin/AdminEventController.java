@@ -40,8 +40,10 @@ public class AdminEventController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AdminEventResponse>> createEvent(@Valid @RequestBody AdminEventCreateRequest request) {
-        AdminEventResponse created = adminEventService.createEvent(request);
+    public ResponseEntity<ApiResponse<AdminEventResponse>> createEvent(
+            @Valid @RequestBody AdminEventCreateRequest request,
+            @RequestParam(value = "owner", required = false) String ownerIdentifier) {
+        AdminEventResponse created = adminEventService.createEvent(request, ownerIdentifier);
         return new ResponseEntity<>(new ApiResponse<>(HttpStatus.CREATED.value(), "Tạo sự kiện thành công", created), HttpStatus.CREATED);
     }
 
@@ -49,6 +51,7 @@ public class AdminEventController {
     public ResponseEntity<ApiResponse<AdminEventResponse>> updateEvent(
             @PathVariable String eventId,
             @Valid @RequestBody AdminEventUpdateRequest request) {
+        System.out.println("[AdminEventController] updateEvent called with eventId=" + eventId);
         AdminEventResponse updated = adminEventService.updateEvent(eventId, request);
         return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Cập nhật sự kiện thành công", updated));
     }
@@ -60,8 +63,9 @@ public class AdminEventController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AdminEventResponse>>> getAllEvents() {
-        List<AdminEventResponse> events = adminEventService.getAllEvents();
+    public ResponseEntity<ApiResponse<List<AdminEventResponse>>> getAllEvents(
+            @RequestParam(value = "owner", required = false) String ownerIdentifier) {
+        List<AdminEventResponse> events = adminEventService.getAllEvents(ownerIdentifier);
         return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Lấy danh sách sự kiện thành công", events));
     }
 

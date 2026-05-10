@@ -1,147 +1,504 @@
-CREATE TABLE Users (
-                       user_id VARCHAR(50) PRIMARY KEY,
-                       first_name VARCHAR(100),
-                       last_name VARCHAR(100),
-                       email VARCHAR(255) UNIQUE NOT NULL,
-                       role VARCHAR(20) DEFAULT 'customer',
-                       status VARCHAR(20) DEFAULT 'active',
-                       auth_provider VARCHAR(20) DEFAULT 'local',
-                       provider_id VARCHAR(255),
-                       password VARCHAR(255),
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+-- Đang kết xuất đổ cấu trúc cơ sở dữ liệu cho 8threads_event_db
+CREATE DATABASE IF NOT EXISTS `8threads_event_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+USE `8threads_event_db`;
 
-CREATE TABLE Event (
-                       event_id VARCHAR(50) PRIMARY KEY,
-                       name VARCHAR(255) NOT NULL,
-                       category_id VARCHAR(50),
-                       description TEXT,
-                       img VARCHAR(500),
-                       start_time DATETIME,
-                       end_time DATETIME,
-                       sale_start DATETIME,
-                       sale_end DATETIME,
-                       venue_name VARCHAR(255),
-                       city VARCHAR(100),
-                       country VARCHAR(100),
-                       status VARCHAR(20) DEFAULT 'active',
-                       created_by VARCHAR(50),
-                       CONSTRAINT fk_event_creator
-                           FOREIGN KEY (created_by) REFERENCES Users(user_id)
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.event
+CREATE TABLE IF NOT EXISTS `event` (
+                                       `event_id` varchar(50) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `category_id` varchar(50) DEFAULT NULL,
+    `description` text DEFAULT NULL,
+    `img` varchar(500) DEFAULT NULL,
+    `start_time` datetime DEFAULT NULL,
+    `end_time` datetime DEFAULT NULL,
+    `sale_start` datetime DEFAULT NULL,
+    `sale_end` datetime DEFAULT NULL,
+    `venue_name` varchar(255) DEFAULT NULL,
+    `city` varchar(100) DEFAULT NULL,
+    `country` varchar(100) DEFAULT NULL,
+    `status` varchar(20) DEFAULT 'active',
+    `created_by` varchar(50) DEFAULT NULL,
+    PRIMARY KEY (`event_id`),
+    KEY `fk_event_creator` (`created_by`),
+    CONSTRAINT `fk_event_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Ticket_Types (
-                              ticket_type_id VARCHAR(50) PRIMARY KEY,
-                              event_id VARCHAR(50) NOT NULL,
-                              name VARCHAR(100) NOT NULL,
-                              type VARCHAR(50),
-                              price DECIMAL(15,2) NOT NULL DEFAULT 0,
-                              total_quantity INT NOT NULL DEFAULT 0,
-                              sold_quantity INT NOT NULL DEFAULT 0,
-                              is_active BOOLEAN DEFAULT TRUE,
-                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.event: ~15 rows (xấp xỉ)
+INSERT INTO `event` (`event_id`, `name`, `category_id`, `description`, `img`, `start_time`, `end_time`, `sale_start`, `sale_end`, `venue_name`, `city`, `country`, `status`, `created_by`) VALUES
+                                                                                                                                                                                               ('e_1778070335927', 'Đêm nhạc hội Mùa Hè', 'music', 'Lễ hội âm nhạc lớn nhất năm', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778070334/podikh7ojrladdugqz5u.jpg', '2026-06-15 19:00:00', '2026-06-15 23:00:00', '2026-05-10 08:00:00', '2026-06-14 23:59:59', 'Sân vận động Mỹ Đình', 'Hà Nội', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778073948824', 'Hội thảo Trí tuệ Nhân tạo AI & Tương lai', 'workshop', 'Cập nhật những xu hướng công nghệ AI mới nhất và ứng dụng thực tiễn trong doanh nghiệp.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778073947/kpxok8wjaf1swp9wlw20.jpg', '2026-07-20 08:30:00', '2026-07-20 17:00:00', '2026-06-01 00:00:00', '2026-07-19 23:59:59', 'Trung tâm Hội nghị GEM Center', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778074020108', 'Sài Gòn Tếu Live - Chuyện Đêm Khuya', 'comedy', 'Show hài độc thoại cực kỳ mặn mà với dàn diễn viên quen thuộc từ Sài Gòn Tếu.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778074018/r88u8ki7qspdn8gscnvx.jpg', '2026-08-05 20:00:00', '2026-08-05 22:30:00', '2026-07-01 08:00:00', '2026-08-04 23:59:59', 'Nhà hát Bến Thành', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778074125919', 'Giải chạy VnExpress Marathon Nha Trang 2026', 'sports', 'Cung đường ven biển tuyệt đẹp chờ đón hơn 10.000 runner từ khắp cả nước.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778074123/qgjoktpdiacy2mnwwppc.jpg', '2026-08-23 04:00:00', '2026-08-23 11:00:00', '2026-05-15 09:00:00', '2026-08-10 23:59:59', 'Quảng trường 2 tháng 4', 'Nha Trang', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778074204769', 'Chung kết VCS Mùa Hè 2027', 'esports', 'Trận chiến sinh tử tranh vé đi CKTG giữa 2 đội tuyển LMHT hàng đầu Việt Nam.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778074203/mnq1hpekgwlcyoprujsc.jpg', '2026-09-09 16:00:00', '2026-09-09 21:00:00', '2026-08-15 12:00:00', '2026-09-08 23:59:59', 'Nhà thi đấu Quân Khu 7', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778074397246', 'Vở kịch: Bông Hồng Cài Áo', 'art', 'Tác phẩm kinh điển đầy xúc động về tình mẫu tử, do đạo diễn NSƯT Thành Lộc dàn dựng.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778074395/mntyyewthjnogitkcapo.jpg', '2026-09-02 19:30:00', '2026-09-02 22:00:00', '2026-07-20 08:00:00', '2026-09-01 23:59:59', 'Nhà hát Kịch IDECAF', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778234304490', 'Hà Anh Tuấn - Chân Trời Rực Rỡ', 'music', 'Live concert với những bản tình ca sâu lắng và dàn nhạc giao hưởng hoành tráng.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778234304/igvsms6savtyzuzhhlzb.png', '2026-11-20 19:30:00', '2026-11-20 22:30:00', '2026-09-15 08:00:00', '2026-11-19 23:59:59', 'Nhà hát Hòa Bình', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778234988110', 'Sài Gòn Tếu - Chuyện Đêm Khuya', 'comedy', 'Show hài độc thoại cực kỳ mặn mà và duyên dáng với sự góp mặt của Uy Lê, Phương Nam và dàn diễn viên Sài Gòn Tếu.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778234988/oae6xusflpoxtf74x0cy.png', '2026-08-05 20:00:00', '2026-08-05 22:30:00', '2026-07-01 08:00:00', '2026-08-04 23:59:59', 'Nhà hát Bến Thành', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778235400543', 'Ravolution Music Festival 2026', 'music', 'Siêu lễ hội âm nhạc điện tử lớn nhất Việt Nam với sự xuất hiện của các DJ Top 100 MAG thế giới.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778235400/qsoa9t6tmwv1sa0yvrjd.png', '2026-10-31 15:00:00', '2026-10-31 23:59:59', '2026-09-01 10:00:00', '2026-10-30 23:59:59', 'Khu đô thị Sala', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778235492219', 'VnExpress Marathon Ho Chi Minh City Midnight 2026', 'sports', 'Giải chạy đêm quy mô hàng chục ngàn người, khám phá vẻ đẹp lung linh của Sài Gòn về đêm qua các cây cầu biểu tượng.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778235492/nnkhq1nbbfpygt1o9vff.png', '2026-11-15 00:00:00', '2026-11-15 06:00:00', '2026-08-15 08:00:00', '2026-11-10 23:59:59', 'Đường Lê Duẩn (Vạch xuất phát)', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778235635014', 'Nhạc kịch: Nhắm Mắt Thấy Mùa Hè', 'art', 'Chuyển thể từ bộ phim điện ảnh cùng tên, vở nhạc kịch mang đến câu chuyện tình yêu trong trẻo, lãng mạn tại thị trấn Higashikawa.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778235635/n9eilmxor1cdifntuw3o.png', '2026-09-18 19:30:00', '2026-09-18 22:00:00', '2026-08-01 09:00:00', '2026-09-17 23:59:59', 'Nhà hát Thành Phố', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778235824125', 'Tóc Tiên - Clear Head Live Concert', 'music', 'Đêm diễn đánh dấu sự lột xác của Tóc Tiên với những bản hit đình đám được phối lại cực kỳ sôi động cùng vũ đạo bắt mắt.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778235824/pejwjln5nspvjqgotwyq.png', '2026-12-19 20:00:00', '2026-12-19 23:00:00', '2026-11-05 12:00:00', '2026-12-18 23:59:59', 'Trung tâm Sự kiện GEM Center', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778235948594', 'Hội thảo Công nghệ: Tương lai của AI trong Kỹ thuật Phần mềm', 'workshop', 'Sự kiện chuyên sâu thảo luận về tác động của Trí tuệ Nhân tạo đến thị trường lao động công nghệ, với sự góp mặt của các chuyên gia đầu ngành.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778235948/tp4xauidhwunglo6gksr.png', '2026-09-20 08:30:00', '2026-09-20 17:00:00', '2026-08-01 08:00:00', '2026-09-19 23:59:59', 'Trung tâm Hội nghị Riverside Palace', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778236258214', 'Vietnam Web & Backend Summit 2026', 'workshop', 'Hội nghị lớn nhất năm dành cho lập trình viên, chia sẻ các kỹ thuật nâng cao về kiến trúc hệ thống, Spring Boot, và Next.js.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778236258/hsebzb57fzpsh0ssozmv.png', '2026-10-18 09:00:00', '2026-10-18 18:00:00', '2026-09-01 08:00:00', '2026-10-15 23:59:59', 'Khách sạn New World', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36'),
+                                                                                                                                                                                               ('e_1778236427360', 'Vietnam Fitness Expo & Bodybuilding 2026', 'sports', 'Lễ hội quy tụ cộng đồng đam mê gym và thể hình, trải nghiệm thiết bị tập luyện hiện đại và theo dõi các cuộc thi hình thể hấp dẫn.', 'http://res.cloudinary.com/dnpp54p32/image/upload/v1778236427/m1y7nwn1qnoe8of2ckpx.png', '2026-11-21 09:00:00', '2026-11-22 20:00:00', '2026-10-01 09:00:00', '2026-11-20 23:59:59', 'Nhà thi đấu Nguyễn Du', 'Hồ Chí Minh', 'Vietnam', 'active', '3290ca10-838f-4b27-94ab-863792127f36');
 
-                              CONSTRAINT fk_ticket_type_event
-                                  FOREIGN KEY (event_id) REFERENCES Event(event_id)
-                                      ON DELETE CASCADE
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.order_items
+CREATE TABLE IF NOT EXISTS `order_items` (
+                                             `id` int(11) NOT NULL AUTO_INCREMENT,
+    `order_id` varchar(50) NOT NULL,
+    `ticket_type_id` bigint(20) DEFAULT NULL,
+    `quantity` int(11) NOT NULL DEFAULT 1,
+    `unit_price` decimal(15,2) NOT NULL,
+    `subtotal` decimal(15,2) NOT NULL,
+    `voucher_id` varchar(50) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `fk_order_items_order` (`order_id`),
+    KEY `fk_order_items_voucher` (`voucher_id`),
+    KEY `FKpcp79oqd3cihkrcb4j0bojtor` (`ticket_type_id`),
+    CONSTRAINT `FKpcp79oqd3cihkrcb4j0bojtor` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`ticket_type_id`),
+    CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_order_items_voucher` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`voucher_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Orders (
-                        order_id VARCHAR(50) PRIMARY KEY,
-                        user_id VARCHAR(50) NOT NULL,
-                        event_id VARCHAR(50) NOT NULL,
-                        total_amount DECIMAL(15,2) NOT NULL DEFAULT 0,
-                        status VARCHAR(20) DEFAULT 'pending',
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.order_items: ~52 rows (xấp xỉ)
+INSERT INTO `order_items` (`id`, `order_id`, `ticket_type_id`, `quantity`, `unit_price`, `subtotal`, `voucher_id`) VALUES
+                                                                                                                       (1, 'ORD_1778149900213', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (2, 'ORD_1778149900213', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (3, 'ORD_1778150605478', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (4, 'ORD_1778150605478', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (5, 'ORD_1778151583885', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (6, 'ORD_1778151583885', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (7, 'ORD_1778151671377', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (8, 'ORD_1778151671377', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (9, 'ORD_1778152219873', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (10, 'ORD_1778152219873', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (11, 'ORD_1778152250861', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (12, 'ORD_1778152250861', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (13, 'ORD_1778152744006', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (14, 'ORD_1778152744006', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (15, 'ORD_1778153024536', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (16, 'ORD_1778153024536', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (17, 'ORD_1778153147866', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (18, 'ORD_1778153147866', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (19, 'ORD_1778153493373', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (20, 'ORD_1778153493373', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (21, 'ORD_1778153696536', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (22, 'ORD_1778153696536', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (23, 'ORD_1778164762139', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (24, 'ORD_1778164762139', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (25, 'ORD_1778212898728', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (26, 'ORD_1778212898728', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (27, 'ORD_1778246650119', 53, 1, 2000000.00, 2000000.00, NULL),
+                                                                                                                       (28, 'ORD_1778246650119', 53, 1, 2000000.00, 2000000.00, NULL),
+                                                                                                                       (29, 'ORD_1778246650119', 31, 5, 2500000.00, 12500000.00, NULL),
+                                                                                                                       (30, 'ORD_1778249812852', 42, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (31, 'ORD_1778249812852', 31, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (32, 'ORD_1778294297137', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (33, 'ORD_1778294297137', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (34, 'ORD_1778304499371', 155, 1, 1500000.00, 1500000.00, NULL),
+                                                                                                                       (35, 'ORD_1778304499371', 155, 1, 1500000.00, 1500000.00, NULL),
+                                                                                                                       (36, 'ORD_1778346566270', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (37, 'ORD_1778346566270', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (38, 'ORD_1778346761878', 1, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (39, 'ORD_1778346761878', 2, 1, 2500000.00, 2500000.00, NULL),
+                                                                                                                       (40, 'ORD_1778347084050', 95, 1, 1650000.00, 1650000.00, NULL),
+                                                                                                                       (41, 'ORD_1778347084050', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (42, 'ORD_1778347927867', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (43, 'ORD_1778347927867', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (44, 'ORD_1778348213562', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (45, 'ORD_1778348213562', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (46, 'ORD_1778348594011', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (47, 'ORD_1778348594011', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (48, 'ORD_1778348978517', 113, 1, 650000.00, 650000.00, NULL),
+                                                                                                                       (49, 'ORD_1778348978517', 113, 1, 650000.00, 650000.00, NULL),
+                                                                                                                       (50, 'ORD_1778349700667', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (51, 'ORD_1778349700667', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (52, 'ORD_1778349918089', 139, 1, 1100000.00, 1100000.00, NULL),
+                                                                                                                       (53, 'ORD_1778349918089', 139, 1, 1100000.00, 1100000.00, NULL),
+                                                                                                                       (54, 'ORD_1778351170177', 109, 1, 750000.00, 750000.00, NULL),
+                                                                                                                       (55, 'ORD_1778351170177', 109, 1, 750000.00, 750000.00, NULL);
 
-                        CONSTRAINT fk_orders_user
-                            FOREIGN KEY (user_id) REFERENCES Users(user_id),
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.orders
+CREATE TABLE IF NOT EXISTS `orders` (
+                                        `order_id` varchar(50) NOT NULL,
+    `user_id` varchar(50) NOT NULL,
+    `event_id` varchar(50) NOT NULL,
+    `total_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
+    `status` varchar(20) DEFAULT 'pending',
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`order_id`),
+    KEY `fk_orders_user` (`user_id`),
+    KEY `fk_orders_event` (`event_id`),
+    CONSTRAINT `fk_orders_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`),
+    CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-                        CONSTRAINT fk_orders_event
-                            FOREIGN KEY (event_id) REFERENCES Event(event_id)
-);
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.orders: ~26 rows (xấp xỉ)
+INSERT INTO `orders` (`order_id`, `user_id`, `event_id`, `total_amount`, `status`, `created_at`) VALUES
+                                                                                                     ('ORD_1778149900213', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 10:31:40'),
+                                                                                                     ('ORD_1778150605478', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 10:43:25'),
+                                                                                                     ('ORD_1778151583885', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 10:59:43'),
+                                                                                                     ('ORD_1778151671377', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 11:01:11'),
+                                                                                                     ('ORD_1778152219873', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 11:10:19'),
+                                                                                                     ('ORD_1778152250861', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 11:10:50'),
+                                                                                                     ('ORD_1778152744006', 'admin_test', 'e_1778070335927', 5000000.00, 'paid', '2026-05-07 11:19:04'),
+                                                                                                     ('ORD_1778153024536', 'admin_test', 'e_1778070335927', 5000000.00, 'paid', '2026-05-07 11:23:44'),
+                                                                                                     ('ORD_1778153147866', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 11:25:47'),
+                                                                                                     ('ORD_1778153493373', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-07 11:31:33'),
+                                                                                                     ('ORD_1778153696536', 'admin_test', 'e_1778070335927', 5000000.00, 'paid', '2026-05-07 11:34:56'),
+                                                                                                     ('ORD_1778164762139', 'admin_test', 'e_1778070335927', 5000000.00, 'paid', '2026-05-07 14:39:22'),
+                                                                                                     ('ORD_1778212898728', 'admin_test', 'e_1778070335927', 5000000.00, 'pending', '2026-05-08 04:01:38'),
+                                                                                                     ('ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'e_1778073948824', 16500000.00, 'paid', '2026-05-08 13:24:10'),
+                                                                                                     ('ORD_1778249812852', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'e_1778073948824', 5000000.00, 'paid', '2026-05-08 14:16:52'),
+                                                                                                     ('ORD_1778294297137', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'e_1778070335927', 5000000.00, 'paid', '2026-05-09 02:38:17'),
+                                                                                                     ('ORD_1778304499371', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'e_1778234304490', 3000000.00, 'paid', '2026-05-09 05:28:19'),
+                                                                                                     ('ORD_1778346566270', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778070335927', 5000000.00, 'pending', '2026-05-09 17:09:26'),
+                                                                                                     ('ORD_1778346761878', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778070335927', 5000000.00, 'pending', '2026-05-09 17:12:41'),
+                                                                                                     ('ORD_1778347084050', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 2400000.00, 'pending', '2026-05-09 17:18:04'),
+                                                                                                     ('ORD_1778347927867', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1500000.00, 'pending', '2026-05-09 17:32:07'),
+                                                                                                     ('ORD_1778348213562', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1500000.00, 'pending', '2026-05-09 17:36:53'),
+                                                                                                     ('ORD_1778348594011', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1500000.00, 'pending', '2026-05-09 17:43:14'),
+                                                                                                     ('ORD_1778348978517', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1300000.00, 'pending', '2026-05-09 17:49:38'),
+                                                                                                     ('ORD_1778349700667', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1500000.00, 'pending', '2026-05-09 18:01:40'),
+                                                                                                     ('ORD_1778349918089', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074397246', 2200000.00, 'pending', '2026-05-09 18:05:18'),
+                                                                                                     ('ORD_1778351170177', '3ef0186a-d168-476b-9338-5e393859bd10', 'e_1778074125919', 1500000.00, 'paid', '2026-05-09 18:26:10');
 
-CREATE TABLE Vouchers (
-                          voucher_id VARCHAR(50) PRIMARY KEY,
-                          voucher_name VARCHAR(255) NOT NULL,
-                          conditions TEXT,
-                          time_start DATETIME,
-                          time_end DATETIME,
-                          promotion VARCHAR(255),
-                          voucher_type ENUM('percent', 'fixed') NOT NULL,
-                          value DECIMAL(15,2) NOT NULL,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.payments
+CREATE TABLE IF NOT EXISTS `payments` (
+                                          `payment_id` varchar(50) NOT NULL,
+    `order_id` varchar(50) NOT NULL,
+    `method` varchar(20) DEFAULT 'vnpay',
+    `amount` decimal(15,2) NOT NULL,
+    `currency` varchar(10) DEFAULT 'VND',
+    `status` varchar(20) DEFAULT 'pending',
+    `txn_ref` varchar(100) DEFAULT NULL,
+    `paid_at` datetime DEFAULT NULL,
+    PRIMARY KEY (`payment_id`),
+    UNIQUE KEY `order_id` (`order_id`),
+    CONSTRAINT `fk_payments_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Voucher_Events (
-                                voucher_id VARCHAR(50),
-                                event_id VARCHAR(50),
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.payments: ~9 rows (xấp xỉ)
+INSERT INTO `payments` (`payment_id`, `order_id`, `method`, `amount`, `currency`, `status`, `txn_ref`, `paid_at`) VALUES
+                                                                                                                      ('PAY_07C8EE7A', 'ORD_1778294297137', 'VNPAY', 5000000.00, NULL, 'success', '15530694', '2026-05-09 09:39:23'),
+                                                                                                                      ('PAY_0DCA88A2', 'ORD_1778164762139', 'VNPAY', 5000000.00, NULL, 'success', '15528447', '2026-05-07 21:39:58'),
+                                                                                                                      ('PAY_147BBC3D', 'ORD_1778246650119', 'VNPAY', 16500000.00, NULL, 'success', '15530236', '2026-05-08 20:25:56'),
+                                                                                                                      ('PAY_232486C6', 'ORD_1778153696536', 'VNPAY', 5000000.00, NULL, 'success', '15528249', '2026-05-07 18:35:30'),
+                                                                                                                      ('PAY_31BE80CB', 'ORD_1778351170177', 'VNPAY', 1500000.00, NULL, 'success', '15531504', '2026-05-10 01:26:40'),
+                                                                                                                      ('PAY_3CA55FF0', 'ORD_1778153024536', 'VNPAY', 5000000.00, NULL, 'success', '15528231', '2026-05-07 18:24:18'),
+                                                                                                                      ('PAY_804B6F64', 'ORD_1778304499371', 'VNPAY', 3000000.00, NULL, 'success', '15530869', '2026-05-09 12:29:22'),
+                                                                                                                      ('PAY_981DF2B5', 'ORD_1778249812852', 'VNPAY', 5000000.00, NULL, 'success', '15530297', '2026-05-08 21:17:30'),
+                                                                                                                      ('PAY_FCE5355F', 'ORD_1778152744006', 'VNPAY', 5000000.00, NULL, 'success', '15528225', '2026-05-07 18:19:36');
 
-                                PRIMARY KEY (voucher_id, event_id),
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.ticket_types
+CREATE TABLE IF NOT EXISTS `ticket_types` (
+                                              `ticket_type_id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `event_id` varchar(50) DEFAULT NULL,
+    `name` varchar(100) NOT NULL,
+    `type` varchar(50) DEFAULT NULL,
+    `price` decimal(15,2) NOT NULL,
+    `total_quantity` int(11) NOT NULL,
+    `sold_quantity` int(11) DEFAULT 0,
+    `is_active` tinyint(1) DEFAULT 1,
+    `created_at` datetime DEFAULT current_timestamp(),
+    PRIMARY KEY (`ticket_type_id`),
+    KEY `fk_ticket_event` (`event_id`),
+    CONSTRAINT `fk_ticket_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-                                CONSTRAINT fk_ve_voucher
-                                    FOREIGN KEY (voucher_id) REFERENCES Vouchers(voucher_id)
-                                        ON DELETE CASCADE,
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.ticket_types: ~180 rows (xấp xỉ)
+INSERT INTO `ticket_types` (`ticket_type_id`, `event_id`, `name`, `type`, `price`, `total_quantity`, `sold_quantity`, `is_active`, `created_at`) VALUES
+                                                                                                                                                     (1, 'e_1778070335927', 'Đa sắc', 'STANDING', 2500000.00, 100, 5, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (2, 'e_1778070335927', 'Đa tình', 'STANDING', 2500000.00, 100, 5, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (3, 'e_1778070335927', 'Rực lửa 1', 'STANDING', 2000000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (4, 'e_1778070335927', 'Rực lửa 2', 'STANDING', 2000000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (5, 'e_1778070335927', 'Bí ẩn 1', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (6, 'e_1778070335927', 'Bí ẩn 2', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (7, 'e_1778070335927', 'Nham thạch 1', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (8, 'e_1778070335927', 'Nham thạch 2', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (9, 'e_1778070335927', 'Thanh xuân 1', 'STANDING', 1500000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (10, 'e_1778070335927', 'Thanh xuân 2', 'STANDING', 1500000.00, 100, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (11, 'e_1778070335927', 'Xương rồng 1', 'SEATED', 1200000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (12, 'e_1778070335927', 'Xương rồng 2', 'SEATED', 1200000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (13, 'e_1778070335927', 'Sao sáng 1', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (14, 'e_1778070335927', 'Sao sáng 2', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (15, 'e_1778070335927', 'Tái sinh 1', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (16, 'e_1778070335927', 'Tái sinh 2', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (17, 'e_1778070335927', 'Ngũ hành 1', 'SEATED', 800000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (18, 'e_1778070335927', 'Ngũ hành 2', 'SEATED', 800000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (19, 'e_1778070335927', 'Nhà hát 1', 'SEATED', 800000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (20, 'e_1778070335927', 'Nhà hát 2', 'SEATED', 800000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (21, 'e_1778070335927', 'Xuân hạ thu đông 1', 'SEATED', 900000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (22, 'e_1778070335927', 'Xuân hạ thu đông 2', 'SEATED', 900000.00, 150, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (23, 'e_1778070335927', 'Đam mê 1', 'SEATED', 700000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (24, 'e_1778070335927', 'Đam mê 2', 'SEATED', 700000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (25, 'e_1778070335927', 'Sục sôi 1', 'SEATED', 700000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (26, 'e_1778070335927', 'Sục sôi 2', 'SEATED', 700000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (27, 'e_1778070335927', 'Huyền thoại 1', 'SEATED', 600000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (28, 'e_1778070335927', 'Huyền thoại 2', 'SEATED', 600000.00, 200, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (29, 'e_1778070335927', 'S-VIP 1', 'VIP', 5000000.00, 50, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (30, 'e_1778070335927', 'S-VIP 2', 'VIP', 5000000.00, 50, 0, 1, '2026-05-07 09:50:04'),
+                                                                                                                                                     (31, 'e_1778073948824', 'Đa sắc', 'STANDING', 2500000.00, 100, 6, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (32, 'e_1778073948824', 'Thanh xuân 2', 'STANDING', 1500000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (33, 'e_1778073948824', 'Xương rồng 1', 'SEATED', 1200000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (34, 'e_1778073948824', 'Xương rồng 2', 'SEATED', 1200000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (35, 'e_1778073948824', 'Sao sáng 1', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (36, 'e_1778073948824', 'Sao sáng 2', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (37, 'e_1778073948824', 'Tái sinh 1', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (38, 'e_1778073948824', 'Tái sinh 2', 'SEATED', 1000000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (39, 'e_1778073948824', 'Ngũ hành 1', 'SEATED', 800000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (40, 'e_1778073948824', 'Ngũ hành 2', 'SEATED', 800000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (41, 'e_1778073948824', 'Nhà hát 1', 'SEATED', 800000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (42, 'e_1778073948824', 'Đa hình', 'STANDING', 2500000.00, 100, 1, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (43, 'e_1778073948824', 'Nhà hát 2', 'SEATED', 800000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (44, 'e_1778073948824', 'Xuân hạ thu đông 1', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (45, 'e_1778073948824', 'Xuân hạ thu đông 2', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (46, 'e_1778073948824', 'Đam mê 1', 'SEATED', 700000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (47, 'e_1778073948824', 'Đam mê 2', 'SEATED', 700000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (48, 'e_1778073948824', 'Sục sôi 1', 'SEATED', 700000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (49, 'e_1778073948824', 'Sục sôi 2', 'SEATED', 700000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (50, 'e_1778073948824', 'Huyền thoại 1', 'SEATED', 600000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (51, 'e_1778073948824', 'Huyền thoại 2', 'SEATED', 600000.00, 200, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (52, 'e_1778073948824', 'S-VIP 1', 'VIP', 5000000.00, 50, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (53, 'e_1778073948824', 'Rực lửa 1', 'STANDING', 2000000.00, 100, 2, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (54, 'e_1778073948824', 'S-VIP 2', 'VIP', 5000000.00, 50, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (55, 'e_1778073948824', 'Rực lửa 2', 'STANDING', 2000000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (56, 'e_1778073948824', 'Bí ẩn 1', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (57, 'e_1778073948824', 'Bí ẩn 2', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (58, 'e_1778073948824', 'Nham thạch 1', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (59, 'e_1778073948824', 'Nham thạch 2', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (60, 'e_1778073948824', 'Nham thạch 3', 'STANDING', 1800000.00, 100, 0, 1, '2026-05-08 19:40:58'),
+                                                                                                                                                     (61, 'e_1778074020108', 'Đa sắc', 'STANDING', 2600000.00, 120, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (62, 'e_1778074020108', 'Đa tình', 'STANDING', 2600000.00, 120, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (63, 'e_1778074020108', 'Rực lửa 1', 'STANDING', 2100000.00, 110, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (64, 'e_1778074020108', 'Rực lửa 2', 'STANDING', 2100000.00, 110, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (65, 'e_1778074020108', 'Bí ẩn 1', 'STANDING', 1900000.00, 100, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (66, 'e_1778074020108', 'Bí ẩn 2', 'STANDING', 1900000.00, 100, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (67, 'e_1778074020108', 'Nham thạch 1', 'STANDING', 1850000.00, 100, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (68, 'e_1778074020108', 'Nham thạch 2', 'STANDING', 1850000.00, 100, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (69, 'e_1778074020108', 'Thanh xuân 1', 'STANDING', 1550000.00, 120, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (70, 'e_1778074020108', 'Thanh xuân 2', 'STANDING', 1550000.00, 120, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (71, 'e_1778074020108', 'Xương rồng 1', 'SEATED', 1300000.00, 180, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (72, 'e_1778074020108', 'Xương rồng 2', 'SEATED', 1300000.00, 180, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (73, 'e_1778074020108', 'Sao sáng 1', 'SEATED', 1100000.00, 160, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (74, 'e_1778074020108', 'Sao sáng 2', 'SEATED', 1100000.00, 160, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (75, 'e_1778074020108', 'Tái sinh 1', 'SEATED', 1100000.00, 160, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (76, 'e_1778074020108', 'Tái sinh 2', 'SEATED', 1100000.00, 160, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (77, 'e_1778074020108', 'Ngũ hành 1', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (78, 'e_1778074020108', 'Ngũ hành 2', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (79, 'e_1778074020108', 'Nhà hát 1', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (80, 'e_1778074020108', 'Nhà hát 2', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (81, 'e_1778074020108', 'Xuân hạ thu đông 1', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (82, 'e_1778074020108', 'Xuân hạ thu đông 2', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (83, 'e_1778074020108', 'Đam mê 1', 'SEATED', 750000.00, 220, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (84, 'e_1778074020108', 'Đam mê 2', 'SEATED', 750000.00, 220, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (85, 'e_1778074020108', 'Sục sôi 1', 'SEATED', 750000.00, 220, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (86, 'e_1778074020108', 'Sục sôi 2', 'SEATED', 750000.00, 220, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (87, 'e_1778074020108', 'Huyền thoại 1', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (88, 'e_1778074020108', 'Huyền thoại 2', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (89, 'e_1778074020108', 'S-VIP 1', 'VIP', 5500000.00, 30, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (90, 'e_1778074020108', 'S-VIP 2', 'VIP', 5500000.00, 30, 0, 1, '2026-05-08 20:59:08'),
+                                                                                                                                                     (91, 'e_1778074125919', 'Đa sắc', 'STANDING', 2300000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (92, 'e_1778074125919', 'Đa tình', 'STANDING', 2300000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (93, 'e_1778074125919', 'Rực lửa 1', 'STANDING', 1850000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (94, 'e_1778074125919', 'Rực lửa 2', 'STANDING', 1850000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (95, 'e_1778074125919', 'Bí ẩn 1', 'STANDING', 1650000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (96, 'e_1778074125919', 'Bí ẩn 2', 'STANDING', 1650000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (97, 'e_1778074125919', 'Nham thạch 1', 'STANDING', 1650000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (98, 'e_1778074125919', 'Nham thạch 2', 'STANDING', 1650000.00, 150, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (99, 'e_1778074125919', 'Thanh xuân 1', 'STANDING', 1400000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (100, 'e_1778074125919', 'Thanh xuân 2', 'STANDING', 1400000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (101, 'e_1778074125919', 'Xương rồng 1', 'SEATED', 1100000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (102, 'e_1778074125919', 'Xương rồng 2', 'SEATED', 1100000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (103, 'e_1778074125919', 'Sao sáng 1', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (104, 'e_1778074125919', 'Sao sáng 2', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (105, 'e_1778074125919', 'Tái sinh 1', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (106, 'e_1778074125919', 'Tái sinh 2', 'SEATED', 950000.00, 200, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (107, 'e_1778074125919', 'Ngũ hành 1', 'SEATED', 750000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (108, 'e_1778074125919', 'Ngũ hành 2', 'SEATED', 750000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (109, 'e_1778074125919', 'Nhà hát 1', 'SEATED', 750000.00, 300, 2, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (110, 'e_1778074125919', 'Nhà hát 2', 'SEATED', 750000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (111, 'e_1778074125919', 'Xuân hạ thu đông 1', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (112, 'e_1778074125919', 'Xuân hạ thu đông 2', 'SEATED', 850000.00, 250, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (113, 'e_1778074125919', 'Đam mê 1', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (114, 'e_1778074125919', 'Đam mê 2', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (115, 'e_1778074125919', 'Sục sôi 1', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (116, 'e_1778074125919', 'Sục sôi 2', 'SEATED', 650000.00, 300, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (117, 'e_1778074125919', 'Huyền thoại 1', 'SEATED', 550000.00, 400, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (118, 'e_1778074125919', 'Huyền thoại 2', 'SEATED', 550000.00, 400, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (119, 'e_1778074125919', 'S-VIP 1', 'VIP', 4800000.00, 60, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (120, 'e_1778074125919', 'S-VIP 2', 'VIP', 4800000.00, 60, 0, 1, '2026-05-08 21:00:01'),
+                                                                                                                                                     (121, 'e_1778074397246', 'Đa sắc', 'STANDING', 3000000.00, 50, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (122, 'e_1778074397246', 'Đa tình', 'STANDING', 3000000.00, 50, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (123, 'e_1778074397246', 'Rực lửa 1', 'STANDING', 2500000.00, 60, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (124, 'e_1778074397246', 'Rực lửa 2', 'STANDING', 2500000.00, 60, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (125, 'e_1778074397246', 'Bí ẩn 1', 'STANDING', 2200000.00, 70, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (126, 'e_1778074397246', 'Bí ẩn 2', 'STANDING', 2200000.00, 70, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (127, 'e_1778074397246', 'Nham thạch 1', 'STANDING', 2200000.00, 70, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (128, 'e_1778074397246', 'Nham thạch 2', 'STANDING', 2200000.00, 70, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (129, 'e_1778074397246', 'Thanh xuân 1', 'STANDING', 1800000.00, 80, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (130, 'e_1778074397246', 'Thanh xuân 2', 'STANDING', 1800000.00, 80, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (131, 'e_1778074397246', 'Xương rồng 1', 'SEATED', 1500000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (132, 'e_1778074397246', 'Xương rồng 2', 'SEATED', 1500000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (133, 'e_1778074397246', 'Sao sáng 1', 'SEATED', 1300000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (134, 'e_1778074397246', 'Sao sáng 2', 'SEATED', 1300000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (135, 'e_1778074397246', 'Tái sinh 1', 'SEATED', 1300000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (136, 'e_1778074397246', 'Tái sinh 2', 'SEATED', 1300000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (137, 'e_1778074397246', 'Ngũ hành 1', 'SEATED', 1100000.00, 120, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (138, 'e_1778074397246', 'Ngũ hành 2', 'SEATED', 1100000.00, 120, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (139, 'e_1778074397246', 'Nhà hát 1', 'SEATED', 1100000.00, 120, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (140, 'e_1778074397246', 'Nhà hát 2', 'SEATED', 1100000.00, 120, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (141, 'e_1778074397246', 'Xuân hạ thu đông 1', 'SEATED', 1200000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (142, 'e_1778074397246', 'Xuân hạ thu đông 2', 'SEATED', 1200000.00, 100, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (143, 'e_1778074397246', 'Đam mê 1', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (144, 'e_1778074397246', 'Đam mê 2', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (145, 'e_1778074397246', 'Sục sôi 1', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (146, 'e_1778074397246', 'Sục sôi 2', 'SEATED', 900000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (147, 'e_1778074397246', 'Huyền thoại 1', 'SEATED', 800000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (148, 'e_1778074397246', 'Huyền thoại 2', 'SEATED', 800000.00, 150, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (149, 'e_1778074397246', 'S-VIP 1', 'VIP', 7000000.00, 15, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (150, 'e_1778074397246', 'S-VIP 2', 'VIP', 7000000.00, 15, 0, 1, '2026-05-08 21:01:33'),
+                                                                                                                                                     (151, 'e_1778234304490', 'Đa sắc', 'STANDING', 2200000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (152, 'e_1778234304490', 'Đa tình', 'STANDING', 2200000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (153, 'e_1778234304490', 'Rực lửa 1', 'STANDING', 1800000.00, 600, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (154, 'e_1778234304490', 'Rực lửa 2', 'STANDING', 1800000.00, 600, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (155, 'e_1778234304490', 'Bí ẩn 1', 'STANDING', 1500000.00, 800, 2, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (156, 'e_1778234304490', 'Bí ẩn 2', 'STANDING', 1500000.00, 800, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (157, 'e_1778234304490', 'Nham thạch 1', 'STANDING', 1500000.00, 800, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (158, 'e_1778234304490', 'Nham thạch 2', 'STANDING', 1500000.00, 800, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (159, 'e_1778234304490', 'Thanh xuân 1', 'STANDING', 1200000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (160, 'e_1778234304490', 'Thanh xuân 2', 'STANDING', 1200000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (161, 'e_1778234304490', 'Xương rồng 1', 'SEATED', 1000000.00, 400, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (162, 'e_1778234304490', 'Xương rồng 2', 'SEATED', 1000000.00, 400, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (163, 'e_1778234304490', 'Sao sáng 1', 'SEATED', 900000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (164, 'e_1778234304490', 'Sao sáng 2', 'SEATED', 900000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (165, 'e_1778234304490', 'Tái sinh 1', 'SEATED', 900000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (166, 'e_1778234304490', 'Tái sinh 2', 'SEATED', 900000.00, 500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (167, 'e_1778234304490', 'Ngũ hành 1', 'SEATED', 600000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (168, 'e_1778234304490', 'Ngũ hành 2', 'SEATED', 600000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (169, 'e_1778234304490', 'Nhà hát 1', 'SEATED', 600000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (170, 'e_1778234304490', 'Nhà hát 2', 'SEATED', 600000.00, 1000, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (171, 'e_1778234304490', 'Xuân hạ thu đông 1', 'SEATED', 800000.00, 600, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (172, 'e_1778234304490', 'Xuân hạ thu đông 2', 'SEATED', 800000.00, 600, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (173, 'e_1778234304490', 'Đam mê 1', 'SEATED', 500000.00, 1200, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (174, 'e_1778234304490', 'Đam mê 2', 'SEATED', 500000.00, 1200, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (175, 'e_1778234304490', 'Sục sôi 1', 'SEATED', 500000.00, 1200, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (176, 'e_1778234304490', 'Sục sôi 2', 'SEATED', 500000.00, 1200, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (177, 'e_1778234304490', 'Huyền thoại 1', 'SEATED', 400000.00, 1500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (178, 'e_1778234304490', 'Huyền thoại 2', 'SEATED', 400000.00, 1500, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (179, 'e_1778234304490', 'S-VIP 1', 'VIP', 6000000.00, 100, 0, 1, '2026-05-08 21:01:49'),
+                                                                                                                                                     (180, 'e_1778234304490', 'S-VIP 2', 'VIP', 6000000.00, 100, 0, 1, '2026-05-08 21:01:49');
 
-                                CONSTRAINT fk_ve_event
-                                    FOREIGN KEY (event_id) REFERENCES Event(event_id)
-                                        ON DELETE CASCADE
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.tickets
+CREATE TABLE IF NOT EXISTS `tickets` (
+                                         `ticket_id` varchar(50) NOT NULL,
+    `event_id` varchar(50) NOT NULL,
+    `ticket_type_id` bigint(20) DEFAULT NULL,
+    `order_id` varchar(50) NOT NULL,
+    `owner_id` varchar(50) NOT NULL,
+    `qr_code` varchar(255) NOT NULL,
+    `status` varchar(20) DEFAULT 'valid',
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`ticket_id`),
+    UNIQUE KEY `qr_code` (`qr_code`),
+    KEY `fk_tickets_event` (`event_id`),
+    KEY `fk_tickets_order` (`order_id`),
+    KEY `fk_tickets_owner` (`owner_id`),
+    KEY `fk_tickets_type` (`ticket_type_id`),
+    CONSTRAINT `fk_tickets_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`),
+    CONSTRAINT `fk_tickets_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
+    CONSTRAINT `fk_tickets_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`user_id`),
+    CONSTRAINT `fk_tickets_type` FOREIGN KEY (`ticket_type_id`) REFERENCES `ticket_types` (`ticket_type_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Order_Items (
-                             id INT AUTO_INCREMENT PRIMARY KEY,
-                             order_id VARCHAR(50) NOT NULL,
-                             ticket_type_id VARCHAR(50) NOT NULL,
-                             quantity INT NOT NULL DEFAULT 1,
-                             unit_price DECIMAL(15,2) NOT NULL,
-                             subtotal DECIMAL(15,2) NOT NULL,
-                             voucher_id VARCHAR(50),
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.tickets: ~23 rows (xấp xỉ)
+INSERT INTO `tickets` (`ticket_id`, `event_id`, `ticket_type_id`, `order_id`, `owner_id`, `qr_code`, `status`, `created_at`) VALUES
+                                                                                                                                 ('2710c257-2424-4e1e-8482-357e1bad54d7', 'e_1778074125919', 109, 'ORD_1778351170177', '3ef0186a-d168-476b-9338-5e393859bd10', 'TKT-1778351200608-9DEC0', 'valid', '2026-05-09 18:26:40'),
+                                                                                                                                 ('27d7b855-d443-4a6a-8703-e2c61405b6ea', 'e_1778070335927', 2, 'ORD_1778294297137', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778294363266-D7C9F', 'valid', '2026-05-09 02:39:23'),
+                                                                                                                                 ('3039bab5-b881-4aa3-8021-0b03b79a09e3', 'e_1778070335927', 1, 'ORD_1778152744006', 'admin_test', 'TKT-1778152776083-EC6D0', 'valid', '2026-05-07 11:19:36'),
+                                                                                                                                 ('3eb16476-8300-4369-852d-a31177ec4dbe', 'e_1778070335927', 1, 'ORD_1778153024536', 'admin_test', 'TKT-1778153058585-9A248', 'valid', '2026-05-07 11:24:18'),
+                                                                                                                                 ('4127900c-b720-4e78-aa08-1e354592e6dd', 'e_1778074125919', 109, 'ORD_1778351170177', '3ef0186a-d168-476b-9338-5e393859bd10', 'TKT-1778351200608-FCBA3', 'valid', '2026-05-09 18:26:40'),
+                                                                                                                                 ('4ddfba0e-a29f-45a3-a7ee-823bcbb48c27', 'e_1778073948824', 31, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756161-90218', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('55fd25c3-4bc3-4d55-bf4c-37b13b0621c6', 'e_1778070335927', 1, 'ORD_1778294297137', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778294363262-2827B', 'valid', '2026-05-09 02:39:23'),
+                                                                                                                                 ('5acdcba7-027b-48c5-948c-e4d8099ad9bf', 'e_1778073948824', 31, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756161-03112', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('64964a5a-10db-4445-9c9c-8535eb4bf061', 'e_1778073948824', 31, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756161-68DDF', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('66bac02d-6d24-4fd8-bd01-b8dae021fb9f', 'e_1778070335927', 2, 'ORD_1778153024536', 'admin_test', 'TKT-1778153058588-3EDCF', 'valid', '2026-05-07 11:24:18'),
+                                                                                                                                 ('675e5111-7b89-4b0d-b33f-5aa1e55b081e', 'e_1778073948824', 42, 'ORD_1778249812852', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778249850547-25A13', 'valid', '2026-05-08 14:17:30'),
+                                                                                                                                 ('6efafe3f-30f5-4dae-8482-1ec26bbb2cf2', 'e_1778070335927', 2, 'ORD_1778164762139', 'admin_test', 'TKT-1778164798914-56ED6', 'valid', '2026-05-07 14:39:58'),
+                                                                                                                                 ('73d31933-6db2-4978-aadc-33189166d8f7', 'e_1778070335927', 1, 'ORD_1778153696536', 'admin_test', 'TKT-1778153730647-1ABD3', 'valid', '2026-05-07 11:35:30'),
+                                                                                                                                 ('7f4ffa04-267c-4870-ba76-683a724bff7b', 'e_1778073948824', 31, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756161-81477', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('825860d6-a676-4edc-ad82-afec3163e6c0', 'e_1778234304490', 155, 'ORD_1778304499371', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778304562206-34A21', 'valid', '2026-05-09 05:29:22'),
+                                                                                                                                 ('8f21582d-a58e-4b81-b2f6-5f50841b2a0b', 'e_1778070335927', 2, 'ORD_1778152744006', 'admin_test', 'TKT-1778152776088-8B94A', 'valid', '2026-05-07 11:19:36'),
+                                                                                                                                 ('a4717445-5424-4be8-ab83-2131475b26a7', 'e_1778073948824', 53, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756159-1AD04', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('ac932c88-2012-459f-a87f-1606fd6ed77c', 'e_1778073948824', 31, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756161-5D15F', 'valid', '2026-05-08 13:25:56'),
+                                                                                                                                 ('b243be2b-a80a-4eaa-afb1-9588db04a1ff', 'e_1778070335927', 1, 'ORD_1778164762139', 'admin_test', 'TKT-1778164798901-58FC0', 'valid', '2026-05-07 14:39:58'),
+                                                                                                                                 ('c3335c98-9572-4a64-b753-029fb57a8b61', 'e_1778234304490', 155, 'ORD_1778304499371', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778304562203-6EA96', 'valid', '2026-05-09 05:29:22'),
+                                                                                                                                 ('cd67c6d9-c59b-4b35-aa18-0a2218d9da91', 'e_1778070335927', 2, 'ORD_1778153696536', 'admin_test', 'TKT-1778153730651-C9B0E', 'valid', '2026-05-07 11:35:30'),
+                                                                                                                                 ('f53752e6-1d7a-4a9b-a6d5-b496d6d52628', 'e_1778073948824', 31, 'ORD_1778249812852', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778249850550-2514C', 'valid', '2026-05-08 14:17:30'),
+                                                                                                                                 ('fd0cc02d-7883-4cb3-b226-86ded00049ec', 'e_1778073948824', 53, 'ORD_1778246650119', 'a763e42f-7a90-416a-98a6-99b26659fd72', 'TKT-1778246756156-25303', 'valid', '2026-05-08 13:25:56');
 
-                             CONSTRAINT fk_order_items_order
-                                 FOREIGN KEY (order_id) REFERENCES Orders(order_id)
-                                     ON DELETE CASCADE,
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.users
+CREATE TABLE IF NOT EXISTS `users` (
+                                       `user_id` varchar(50) NOT NULL,
+    `first_name` varchar(100) DEFAULT NULL,
+    `last_name` varchar(100) DEFAULT NULL,
+    `email` varchar(255) NOT NULL,
+    `role` varchar(20) DEFAULT 'customer',
+    `status` varchar(20) DEFAULT 'active',
+    `auth_provider` varchar(20) DEFAULT 'local',
+    `provider_id` varchar(255) DEFAULT NULL,
+    `password` varchar(255) DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    `reset_password_token` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`user_id`),
+    UNIQUE KEY `email` (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-                             CONSTRAINT fk_order_items_type
-                                 FOREIGN KEY (ticket_type_id) REFERENCES Ticket_Types(ticket_type_id),
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.users: ~6 rows (xấp xỉ)
+INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `role`, `status`, `auth_provider`, `provider_id`, `password`, `created_at`, `updated_at`, `reset_password_token`) VALUES
+                                                                                                                                                                                          ('3290ca10-838f-4b27-94ab-863792127f36', 'Trong', 'S', 'trongalpha890@gmail.com', 'ADMIN', 'active', 'local', NULL, '$2a$10$CrVRDnEbOxrNKg8aasNlLuHe/pw7YMI5N7ThebIO.9awVY26fzy7m', '2026-05-09 13:59:23', '2026-05-09 13:59:23', NULL),
+                                                                                                                                                                                          ('3ef0186a-d168-476b-9338-5e393859bd10', 'trong', 'tan', 'trongtan123tan@gmail.com', 'USER', 'active', 'local', NULL, '$2a$10$a/4OIas5ItyITxlhj0N4cOZWCKdQWRLkjb27VCashSshvMde/G2Fy', '2026-05-09 16:36:18', '2026-05-09 16:36:18', NULL),
+                                                                                                                                                                                          ('42870711-6001-4f1f-8a24-baf1fd66a743', 'Trong', 'Nguyen', 'trong@gmail.com', 'USER', 'active', 'local', NULL, '$2a$10$UZta/QFuyH2E.ljU5TfEYeeKIIxi2IRXzKHc9o5IJ49qy6bCbPm2.', '2026-05-07 12:16:11', '2026-05-08 04:36:37', 'f0335f98-8e5a-4b2d-82a2-beb4438e755c'),
+                                                                                                                                                                                          ('646d724a-db8b-46e5-b78c-c0db0b50098f', 'Nguyen Van', 'Trong', 'tronglq2005@gmaul.com', 'USER', 'active', 'local', NULL, '$2a$10$v7wlUZ9NKHRBAebnfR2M9.pehoUQNxa/RyY2t1rKWGR9Y.CwAmsBS', '2026-05-08 05:00:53', '2026-05-08 05:00:53', NULL),
+                                                                                                                                                                                          ('a763e42f-7a90-416a-98a6-99b26659fd72', 'Nam', 'Trần', 'trong0372816614@gmail.com', 'USER', 'active', 'local', NULL, '$2a$10$3tyxAPQNFb5FzQ6Y4Z7HROJov2rEaC9rDl1kFLfRLaOB7VRsP6pp6', '2026-05-08 12:27:13', '2026-05-08 13:41:21', NULL),
+                                                                                                                                                                                          ('bff9ed90-aaee-4e3f-942e-2a1d1f5e25c1', 'Nguyen Van ', 'A', 'tronglq2005@gmail.com', 'USER', 'active', 'local', NULL, '$2a$10$ZRdmdtMbRjYA.hmRluwsuuTBqpf5xj7rDyUlqLCdsefvB4z/j.ABa', '2026-05-08 05:02:11', '2026-05-08 05:05:53', NULL),
+                                                                                                                                                                                          ('cef736b6-f3c0-4e6c-af95-913ac7e27173', 'trong', 'rew', 'trong890@gmail.com', 'ADMIN', 'active', 'local', NULL, '$2a$10$P7VpxnmTY/QtCX3fJbZhpOtiUrIEsRL1SwueDNQQXfRgV.CYBEz6a', '2026-05-09 16:14:30', '2026-05-09 16:14:30', NULL);
 
-                             CONSTRAINT fk_order_items_voucher
-                                 FOREIGN KEY (voucher_id) REFERENCES Vouchers(voucher_id)
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.voucher_events
+CREATE TABLE IF NOT EXISTS `voucher_events` (
+                                                `voucher_id` varchar(50) NOT NULL,
+    `event_id` varchar(50) NOT NULL,
+    PRIMARY KEY (`voucher_id`,`event_id`),
+    KEY `fk_ve_event` (`event_id`),
+    CONSTRAINT `fk_ve_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_ve_voucher` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`voucher_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Payments (
-                          payment_id VARCHAR(50) PRIMARY KEY,
-                          order_id VARCHAR(50) UNIQUE NOT NULL,
-                          method VARCHAR(20) DEFAULT 'vnpay',
-                          amount DECIMAL(15,2) NOT NULL,
-                          currency VARCHAR(10) DEFAULT 'VND',
-                          status VARCHAR(20) DEFAULT 'pending',
-                          txn_ref VARCHAR(100),
-                          paid_at DATETIME,
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.voucher_events: ~8 rows (xấp xỉ)
+INSERT INTO `voucher_events` (`voucher_id`, `event_id`) VALUES
+                                                            ('EARLYBIRD', 'e_1778070335927'),
+                                                            ('FANNHAC15', 'e_1778070335927'),
+                                                            ('GALA25', 'e_1778070335927'),
+                                                            ('NHACMOI50', 'e_1778070335927'),
+                                                            ('SUMMER50', 'e_1778070335927'),
+                                                            ('THREVENT5', 'e_1778070335927'),
+                                                            ('VIPONLY', 'e_1778070335927'),
+                                                            ('VOUCHER10', 'e_1778070335927');
 
-                          CONSTRAINT fk_payments_order
-                              FOREIGN KEY (order_id) REFERENCES Orders(order_id)
-);
+-- Đang kết xuất đổ cấu trúc cho bảng 8threads_event_db.vouchers
+CREATE TABLE IF NOT EXISTS `vouchers` (
+                                          `voucher_id` varchar(50) NOT NULL,
+    `voucher_name` varchar(255) NOT NULL,
+    `conditions` text DEFAULT NULL,
+    `time_start` datetime DEFAULT NULL,
+    `time_end` datetime DEFAULT NULL,
+    `promotion` varchar(255) DEFAULT NULL,
+    `voucher_type` varchar(50) DEFAULT NULL,
+    `value` decimal(15,2) NOT NULL,
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`voucher_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE Tickets (
-                         ticket_id VARCHAR(50) PRIMARY KEY,
-                         event_id VARCHAR(50) NOT NULL,
-                         ticket_type_id VARCHAR(50) NOT NULL,
-                         order_id VARCHAR(50) NOT NULL,
-                         owner_id VARCHAR(50) NOT NULL,
-                         qr_code VARCHAR(255) UNIQUE NOT NULL,
-                         status VARCHAR(20) DEFAULT 'valid',
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- Đang kết xuất đổ dữ liệu cho bảng 8threads_event_db.vouchers: ~9 rows (xấp xỉ)
+INSERT INTO `vouchers` (`voucher_id`, `voucher_name`, `conditions`, `time_start`, `time_end`, `promotion`, `voucher_type`, `value`, `created_at`) VALUES
 
-                         CONSTRAINT fk_tickets_event
-                             FOREIGN KEY (event_id) REFERENCES Event(event_id),
-
-                         CONSTRAINT fk_tickets_type
-                             FOREIGN KEY (ticket_type_id) REFERENCES Ticket_Types(ticket_type_id),
-
-                         CONSTRAINT fk_tickets_order
-                             FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-
-                         CONSTRAINT fk_tickets_owner
-                             FOREIGN KEY (owner_id) REFERENCES Users(user_id)
-);

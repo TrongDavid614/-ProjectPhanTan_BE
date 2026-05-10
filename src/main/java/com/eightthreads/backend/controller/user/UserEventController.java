@@ -23,13 +23,9 @@ public class UserEventController {
 
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     public ResponseEntity<ApiResponse<Event>> createEvent(
-            // Thêm @Valid vào đây để kích hoạt kiểm tra lỗi
             @Valid @RequestPart("data") EventCreateRequest request,
             @RequestPart(value = "image", required = false) MultipartFile imageFile) {
 
-        // Khi gọi từ Next.js, chúng ta sẽ gửi dữ liệu dạng FormData
-        // Phần text (EventCreateRequest) gửi trong key "data"
-        // Phần file gửi trong key "image"
 
         Event savedEvent = eventService.createEvent(request, imageFile);
 

@@ -14,6 +14,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, String> {
     List<Order> findByUser_UserIdOrderByCreatedAtDesc(String userId);
     List<Order> findByStatus(OrderStatus status);
+    long countByEvent_CreatedBy_UserId(String userId);
 
     @Query("""
             SELECT COALESCE(SUM(o.totalAmount), 0)
@@ -21,4 +22,14 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             WHERE o.status = :status
             """)
     BigDecimal sumTotalAmountByStatus(@Param("status") OrderStatus status);
+
+    @Query("""
+        SELECT COALESCE(SUM(o.totalAmount), 0)
+        FROM Order o
+        WHERE o.status = :status
+          AND o.event.createdBy.userId = :userId
+        """)
+    BigDecimal sumTotalAmountByStatusAndEventCreatedBy_UserId(
+        @Param("status") OrderStatus status,
+        @Param("userId") String userId);
 }

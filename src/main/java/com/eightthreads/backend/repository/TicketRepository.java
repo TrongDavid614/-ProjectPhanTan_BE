@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, String> {
     List<Ticket> findByOwner_UserId(String userId);
+    long countByEvent_CreatedBy_UserId(String userId);
 }

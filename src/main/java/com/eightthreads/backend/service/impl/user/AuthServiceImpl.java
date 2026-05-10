@@ -101,6 +101,11 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Sai tài khoản hoặc mật khẩu");
         }
 
+        // Block admin accounts from logging in via user login page
+        if (!isAdminLogin && user.getRole() == Role.ADMIN) {
+            throw new RuntimeException("Sai tài khoản hoặc mật khẩu");
+        }
+
         if (isAdminLogin && user.getRole() != Role.ADMIN) {
             throw new RuntimeException("Bạn không có quyền truy cập trang quản trị");
         }

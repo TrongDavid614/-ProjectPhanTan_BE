@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,8 +19,9 @@ public class AdminStatsController {
     private final AdminDashboardService adminDashboardService;
 
     @GetMapping("/stats")
-    public ResponseEntity<ApiResponse<AdminDashboardResponse>> getStats() {
-        AdminDashboardResponse stats = adminDashboardService.getDashboardStats();
+    public ResponseEntity<ApiResponse<AdminDashboardResponse>> getStats(
+            @RequestParam(value = "owner", required = false) String ownerIdentifier) {
+        AdminDashboardResponse stats = adminDashboardService.getDashboardStats(ownerIdentifier);
         return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Lấy thống kê dashboard thành công", stats));
     }
 }
